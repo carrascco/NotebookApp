@@ -74,8 +74,21 @@ class MainWindow:
 
         self.update_note_listbox()
 
+        self.update_window_size()
 
-    
+
+    def update_window_size(self):
+        maxNoteLengthX=10
+        maxNoteLengthY=40
+        for note in self.notebook.notes:
+            if len(note)>maxNoteLengthX:
+                maxNoteLengthX=len(note)
+        if(len(self.notebook.notes)*3>maxNoteLengthY):
+            maxNoteLengthY=len(self.notebook.notes)*3
+        self.set_window_size_to_percentage(maxNoteLengthX+9, maxNoteLengthY)
+
+
+
     def open_add_note_window(self):
         # Crea una nueva ventana para agregar una nota
         add_note_window = tk.Toplevel(self.root)
@@ -101,6 +114,7 @@ class MainWindow:
             with open("data/notes.json", "w") as file:
                 
                 json.dump(self.notebook.notes, file)
+            self.update_window_size()
 
     def save_note_and_close(self, window, note_text):
         # Guardar la nueva nota
@@ -108,6 +122,7 @@ class MainWindow:
         # Guardar todas las notas en el archivo JSON
         self.save_notes()
         self.update_note_listbox()
+        self.update_window_size()
         window.destroy()
 
     def load_notes(self):
