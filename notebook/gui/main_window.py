@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from notebook.notebook import Notebook
+import json
 
 class MainWindow:
     def __init__(self, root):
@@ -9,6 +10,9 @@ class MainWindow:
 
         # Crear un objeto Notebook
         self.notebook = Notebook()
+
+        #Cargar notas del archivo JSON
+        self.load_notes()
 
         # Crear un Frame principal
         main_frame = ttk.Frame(self.root)
@@ -46,8 +50,25 @@ class MainWindow:
     def save_note_and_close(self, window, note_text):
         # Guardar la nueva nota
         self.notebook.add_note(note_text)
+        # Guardar todas las notas en el archivo JSON
+        self.save_notes()
         self.update_note_listbox()
         window.destroy()
+
+    def load_notes(self):
+        try:
+            with open("data/notes.json", "r") as file:
+                notes = json.load(file)
+                for note in notes:
+                    self.notebook.add_note(note)
+        except FileNotFoundError:
+            # Si el archivo no existe, no se cargan notas (puede ser la primera ejecución)
+            pass
+
+    def save_notes(self):
+        notes = self.notebook.get_notes()
+        with open("data/notes.json", "w") as file:
+            json.dump(notes, file)
 
     def update_note_listbox(self):
         # Actualizar el listado de notas en el ListBox
