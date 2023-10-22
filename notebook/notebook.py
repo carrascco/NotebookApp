@@ -5,6 +5,9 @@ class Notebook:
         # Inicializa una lista para almacenar las notas
         self.notes = []
 
+    def delete_index(self,index):
+        del self.notes[index]
+
     def add_note(self, note):
         # Agrega una nota a la lista
         self.notes.append(note)
