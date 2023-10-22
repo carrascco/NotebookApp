@@ -6,7 +6,7 @@ import json
 class MainWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("Notebook App")
+        self.root.title("Miguel's Notebook")
 
 
         # Crear un objeto Notebook
@@ -78,16 +78,24 @@ class MainWindow:
 
 
     def update_window_size(self):
-        maxNoteLengthX=10
-        maxNoteLengthY=40
+        maxNoteLengthX=15
         for note in self.notebook.notes:
-            if len(note)>maxNoteLengthX:
-                maxNoteLengthX=len(note)
-        if(len(self.notebook.notes)*3>maxNoteLengthY):
-            maxNoteLengthY=len(self.notebook.notes)*3
-        self.set_window_size_to_percentage(maxNoteLengthX+9, maxNoteLengthY)
+            if self.text_size(note)>maxNoteLengthX:
+                maxNoteLengthX=self.text_size(note)
+        if(maxNoteLengthX<80):
+            self.set_window_size_to_percentage(maxNoteLengthX+8, 40)
+        else:
+            self.set_window_size_to_percentage(80, 40)
 
 
+    def text_size(self, note):
+        count=0
+        for char in note:
+            if not char.isdigit():
+                count+=1
+            else:
+                count+=0.95
+        return count
 
     def open_add_note_window(self):
         # Crea una nueva ventana para agregar una nota
@@ -97,7 +105,19 @@ class MainWindow:
 
         # Crear un campo de texto para ingresar la nota
         note_entry = tk.Entry(add_note_window)
-        note_entry.pack(padx=10, pady=10)
+        note_entry.pack(padx=15, pady=10, ipadx=85)
+
+
+        screen_width = add_note_window.winfo_screenwidth()
+        screen_height = add_note_window.winfo_screenheight()
+    
+        window_width = int(screen_width * 20 / 100)
+        window_height = int(screen_height * 10 / 100)
+    
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+    
+        add_note_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
         # Botón para guardar la nota
         save_button = ttk.Button(add_note_window, text="Guardar Nota", command=lambda: self.save_note_and_close(add_note_window, note_entry.get()))
