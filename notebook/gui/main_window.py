@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from notebook.notebook import Notebook
+from PIL import Image, ImageTk
+from tkinter import messagebox  
 import json
 
 class MainWindow:
@@ -18,6 +20,11 @@ class MainWindow:
 
         self.set_window_size_to_percentage(20, 40)
 
+       # logo_image= Image.open("data\logoGrande.png")
+        #logo_image = ImageTk.PhotoImage(logo_image)
+        #root.iconphoto(True,logo_image)
+       
+        
         #Cargar notas del archivo JSON
         self.load_notes()
 
@@ -25,7 +32,8 @@ class MainWindow:
         style = ttk.Style()
         style.configure("My.TFrame", background="#0453a1")  # Cambia el valor hexadecimal al color que desees
         style.configure("My.TButton", background="#0453a1")
-
+        style.configure("My.TText", background="#0453a1")
+        
         # Crear un Frame principal
         main_frame = ttk.Frame(self.root, style="My.TFrame")
         main_frame.grid(row=0, column=0, sticky="nsew")
@@ -71,6 +79,9 @@ class MainWindow:
         # Botón para eliminar la nota seleccionada
         delete_button = ttk.Button(add_frame, text="Eliminar Nota", command=self.delete_note, style="My.TButton")
         delete_button.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        view_noteBTN = ttk.Button(add_frame, text="Ver Nota", command=self.view_note, style="My.TButton")
+        view_noteBTN.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
 
         self.update_note_listbox()
 
@@ -135,6 +146,26 @@ class MainWindow:
                 
                 json.dump(self.notebook.notes, file)
             self.update_window_size()
+    def view_note(self):
+        selected_index = self.note_listbox.curselection()
+        viewNote_window = tk.Toplevel(self.root)
+        viewNote_window.title("Item "+str(selected_index))
+
+        note_entry = ttk.Label(viewNote_window,text=self.note_listbox.get(selected_index),background="#01add3")
+        note_entry.pack(padx=15, pady=10)
+        
+
+        screen_width = viewNote_window.winfo_screenwidth()
+        screen_height = viewNote_window.winfo_screenheight()
+    
+        window_width = int(screen_width * 20 / 100)
+        window_height = int(screen_height * 10 / 100)
+    
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+    
+        viewNote_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
 
     def save_note_and_close(self, window, note_text):
         # Guardar la nueva nota
