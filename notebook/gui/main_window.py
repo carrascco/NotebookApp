@@ -3,6 +3,7 @@ from tkinter import ttk
 from notebook.notebook import Notebook
 from PIL import Image, ImageTk
 from tkinter import messagebox  
+import datetime
 import json
 
 class MainWindow:
@@ -32,7 +33,7 @@ class MainWindow:
         style = ttk.Style()
         style.configure("My.TFrame", background="#0453a1")  # Cambia el valor hexadecimal al color que desees
         style.configure("My.TButton", background="#0453a1")
-        style.configure("My.TText", background="#0453a1")
+        style.configure("My.TText", background="#0453a1",foreground="white")
         
         # Crear un Frame principal
         main_frame = ttk.Frame(self.root, style="My.TFrame")
@@ -114,16 +115,25 @@ class MainWindow:
         
         add_note_window.title("Agregar Nota")
 
+        note_label = ttk.Label(add_note_window, text="Ingrese la nota:", background="#01add3",foreground="white",font={"Helvetica",16})
+        note_label.pack(padx=15, pady=(20, 0))  # Ajusta el espaciado según sea necesario
+
         # Crear un campo de texto para ingresar la nota
         note_entry = tk.Entry(add_note_window)
         note_entry.pack(padx=15, pady=10, ipadx=85)
+
+        date_label = ttk.Label(add_note_window, text="Ingrese la fecha (opcional):", background="#01add3",foreground="white",font={"Helvetica",16})
+        date_label.pack(padx=15, pady=10)
+        #Crear un campo de texto para ingresar la fecha marcada
+        date_entry = tk.Entry(add_note_window)
+        date_entry.pack(padx=15, pady=10, ipadx=85)
 
 
         screen_width = add_note_window.winfo_screenwidth()
         screen_height = add_note_window.winfo_screenheight()
     
         window_width = int(screen_width * 20 / 100)
-        window_height = int(screen_height * 10 / 100)
+        window_height = int(screen_height * 20 / 100)
     
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
@@ -131,7 +141,7 @@ class MainWindow:
         add_note_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
         # Botón para guardar la nota
-        save_button = ttk.Button(add_note_window, text="Guardar Nota", command=lambda: self.save_note_and_close(add_note_window, note_entry.get()))
+        save_button = ttk.Button(add_note_window, text="Guardar Nota", command=lambda: self.save_note_and_close(add_note_window, note_entry.get(),date_entry.get()), style="My.TButton")
         save_button.pack(padx=10, pady=10)
 
     def delete_note(self):
@@ -148,28 +158,44 @@ class MainWindow:
             self.update_window_size()
     def view_note(self):
         selected_index = self.note_listbox.curselection()
-        viewNote_window = tk.Toplevel(self.root)
-        viewNote_window.title("Item "+str(selected_index))
+        if selected_index:
+            index = int(selected_index[0])
+            note_data = self.notebook.get_notes()[index]
+            
+            # Crear una nueva ventana para mostrar la nota y la fecha
+            viewNote_window = tk.Toplevel(self.root)
+            viewNote_window.title("Ver Nota")
 
-        note_entry = ttk.Label(viewNote_window,text=self.note_listbox.get(selected_index),background="#01add3")
-        note_entry.pack(padx=15, pady=10)
-        
+            note_text = note_data.get("text")
+            note_date = note_data.get("date")
+            
+            note_limit = note_data.get("limit")
 
-        screen_width = viewNote_window.winfo_screenwidth()
-        screen_height = viewNote_window.winfo_screenheight()
-    
-        window_width = int(screen_width * 20 / 100)
-        window_height = int(screen_height * 10 / 100)
-    
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-    
-        viewNote_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+            # Mostrar el texto de la nota y la fecha en la nueva ventana
+            if note_limit:
+                note_entry = ttk.Label(viewNote_window, text=f"Nota: \"{note_text}\"\nFecha de creación: {note_date}\nFecha límite: {note_limit}", background="#01add3", foreground="white", font=("Helvetica",16))
+            else:
+                note_entry = ttk.Label(viewNote_window, text=f"Nota: \"{note_text}\"\nFecha de creación: {note_date}", background="#01add3", foreground="white", font=("Helvetica",16))
+            note_entry.pack(padx=15, pady=10)
+
+            screen_width = viewNote_window.winfo_screenwidth()
+            screen_height = viewNote_window.winfo_screenheight()
+
+            window_width = int(screen_width * 20 / 100)
+            window_height = int(screen_height * 10 / 100)
+
+            x = (screen_width - window_width) // 2
+            y = (screen_height - window_height) // 2
+
+            viewNote_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
 
-    def save_note_and_close(self, window, note_text):
+    def save_note_and_close(self, window, note_text, dateLim):
         # Guardar la nueva nota
-        self.notebook.add_note(note_text)
+        current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        note_with_time = {"text": note_text, "date": current_time, "limit":dateLim}
+
+        self.notebook.add_note(note_with_time)
         # Guardar todas las notas en el archivo JSON
         self.save_notes()
         self.update_note_listbox()
@@ -187,6 +213,9 @@ class MainWindow:
         except FileNotFoundError:
             # Si el archivo no existe, no se cargan notas (puede ser la primera ejecución)
             pass
+        except json.JSONDecodeError:
+            # Si hay un error en el formato JSON, se cargan las notas existentes
+            pass
 
     def save_notes(self):
         notes = self.notebook.get_notes()
@@ -198,7 +227,7 @@ class MainWindow:
         notes = self.notebook.get_notes()
         self.note_listbox.delete(0, tk.END)
         for note in notes:
-            self.note_listbox.insert(tk.END, note)
+            self.note_listbox.insert(tk.END, note.get("text"))
 
     def change_titlebar_color(self, root, color):
         if root.tk_setPalette:
