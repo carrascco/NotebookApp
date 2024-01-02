@@ -6,12 +6,17 @@ from tkinter import messagebox
 import datetime
 import json
 from tkcalendar import Calendar
+import os
 
 class MainWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Miguel's Notebook")
-        root.iconbitmap('data/logo.ico')
+
+        current_dir = os.path.dirname(__file__)
+        two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+        icon_path = os.path.join(two_levels_up, "data", "logo.ico")
+        root.iconbitmap(icon_path)
 
         # Crear un objeto Notebook
         self.notebook = Notebook()
@@ -35,6 +40,8 @@ class MainWindow:
         style.configure("My.TFrame", background="#0453a1")  # Cambia el valor hexadecimal al color que desees
         style.configure("My.TButton", background="#0453a1")
         style.configure("Second.TButton", background="#01add3")
+        style.configure("Third.TButton", background="#01add3",padding=(3, 3), font=("Helvetica", 10))
+        
         
         style.configure("My.TText", background="#0453a1",foreground="white")
         
@@ -100,12 +107,16 @@ class MainWindow:
         # Crear una nueva ventana emergente
         self.calendar_frame = tk.Toplevel(self.root)
         self.calendar_frame.title("Seleccionar Fecha")
-        self.calendar_frame.iconbitmap('data/logo.ico')
+
+        current_dir = os.path.dirname(__file__)
+        two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+        icon_path = os.path.join(two_levels_up, "data", "logo.ico")
+        self.calendar_frame.iconbitmap(icon_path)
 
         self.calendar = Calendar(self.calendar_frame, selectmode="day", year=datetime.datetime.now().year, month=datetime.datetime.now().month, day=datetime.datetime.now().day)
         self.calendar.pack(padx=10, pady=10)
 
-        self.select_button = ttk.Button(self.calendar_frame, text="Seleccionar Fecha", command=self.add_note_with_date)
+        self.select_button = ttk.Button(self.calendar_frame, text="Seleccionar Fecha", command=self.add_note_with_date,style="Second.TButton")
         self.select_button.pack(padx=20, pady=10)
         screen_width = self.calendar_frame.winfo_screenwidth()
         screen_height = self.calendar_frame.winfo_screenheight()
@@ -162,7 +173,11 @@ class MainWindow:
         add_note_window = tk.Toplevel(self.root)
         
         add_note_window.title("Agregar Nota")
-        add_note_window.iconbitmap('data/logo.ico')
+
+        current_dir = os.path.dirname(__file__)
+        two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+        icon_path = os.path.join(two_levels_up, "data", "logo.ico")
+        add_note_window.iconbitmap(icon_path)
 
         note_label = ttk.Label(add_note_window, text="Ingrese la nota:", background="#01add3",foreground="white",font={"Helvetica",16})
         note_label.pack(padx=15, pady=(20, 0))  # Ajusta el espaciado según sea necesario
@@ -173,8 +188,9 @@ class MainWindow:
 
         date_label = ttk.Label(add_note_window, text="Ingrese la fecha (opcional):", background="#01add3",foreground="white",font={"Helvetica",16})
         date_label.pack(padx=15, pady=10)
-        #Crear un campo de texto para ingresar la fecha marcada
-        date_entry = ttk.Button(add_note_window, text="Agregar fecha límite", command=self.open_calendar, style="Second.TButton")
+        
+
+        date_entry = ttk.Button(add_note_window, text="Agregar fecha límite", command=self.open_calendar, style="Third.TButton")
         date_entry.pack(padx=10, pady=10)
 
 
@@ -202,7 +218,11 @@ class MainWindow:
             # Eliminar la nota de la Listbox y de la lista de notas
             self.note_listbox.delete(index)
             self.notebook.delete_index(index)
-            with open("data/notes.json", "w") as file:
+
+            current_dir = os.path.dirname(__file__)
+            two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+            notes_path = os.path.join(two_levels_up, "data", "notes.json")
+            with open(notes_path, "w") as file:
                 
                 json.dump(self.notebook.notes, file)
             self.update_window_size()
@@ -215,7 +235,11 @@ class MainWindow:
             # Crear una nueva ventana para mostrar la nota y la fecha
             viewNote_window = tk.Toplevel(self.root)
             viewNote_window.title("Ver Nota")
-            viewNote_window.iconbitmap('data/logo.ico')
+
+            current_dir = os.path.dirname(__file__)
+            two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+            icon_path = os.path.join(two_levels_up, "data", "logo.ico")
+            viewNote_window.iconbitmap(icon_path)
 
             note_text = note_data.get("text")
             note_date = note_data.get("date")
@@ -268,7 +292,10 @@ class MainWindow:
 
     def load_notes(self):
         try:
-            with open("data/notes.json", "r") as file:
+            current_dir = os.path.dirname(__file__)
+            two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+            notes_path = os.path.join(two_levels_up, "data", "notes.json")
+            with open(notes_path, "r") as file:
                
                 notes = json.load(file)
                 
@@ -283,7 +310,10 @@ class MainWindow:
 
     def save_notes(self):
         notes = self.notebook.get_notes()
-        with open("data/notes.json", "w") as file:
+        current_dir = os.path.dirname(__file__)
+        two_levels_up = os.path.abspath(os.path.join(current_dir, "../../"))
+        notes_path = os.path.join(two_levels_up, "data", "notes.json")
+        with open(notes_path, "w") as file:
             json.dump(notes, file)
 
     def update_note_listbox(self):
