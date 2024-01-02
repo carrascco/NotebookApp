@@ -11,6 +11,7 @@ import os
 class MainWindow:
     def __init__(self, root):
         self.root = root
+        
         self.root.title("Miguel's Notebook")
 
         current_dir = os.path.dirname(__file__)
@@ -43,7 +44,7 @@ class MainWindow:
         style.configure("Third.TButton", background="#01add3",padding=(3, 3), font=("Helvetica", 10))
         
         
-        style.configure("My.TText", background="#0453a1",foreground="white")
+        style.configure("My.TText", background="#0453a1",foreground="white", font=("Helvetica", 8))
         
         # Crear un Frame principal
         main_frame = ttk.Frame(self.root, style="My.TFrame")
@@ -68,7 +69,7 @@ class MainWindow:
         self.note_listbox.pack(fill="both", expand=True)
 
         # Ajustar el tamaño de fuente
-        font = ("Helvetica", 20)  # Cambia el tamaño (14) y la fuente según tus preferencias
+        font = ("Helvetica", 14)  # Cambia el tamaño (14) y la fuente según tus preferencias
         self.note_listbox.configure(font=font)
 
 
@@ -101,6 +102,7 @@ class MainWindow:
         self.calendar_frame = None  # Frame para el calendario
         self.calendar = None  # Calendario
         self.selected_date = None
+
 
 
     def open_calendar(self):
@@ -241,7 +243,8 @@ class MainWindow:
             icon_path = os.path.join(two_levels_up, "data", "logo.ico")
             viewNote_window.iconbitmap(icon_path)
 
-            note_text = note_data.get("text")
+            text = note_data.get("text")
+            note_text=text[3:].strip()
             note_date = note_data.get("date")
             
             note_limit = note_data.get("limit")
@@ -279,9 +282,9 @@ class MainWindow:
         # Guardar la nueva nota
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if not(self.selected_date in ("",None)):
-            note_with_time = {"text": note_text, "date": current_time, "limit":self.selected_date}
+            note_with_time = {"text": "  • "+note_text, "date": current_time, "limit":self.selected_date}
         else :
-            note_with_time = {"text": note_text, "date": current_time}
+            note_with_time = {"text": "  • "+note_text, "date": current_time}
 
         self.notebook.add_note(note_with_time)
         # Guardar todas las notas en el archivo JSON
