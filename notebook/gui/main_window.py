@@ -123,8 +123,16 @@ class MainWindow:
         selected = self.calendar.get_date()
 
         mes, dia, año = selected.split('/')
+#        año="20"+año
         self.selected_date = f"{dia}/{mes}/{año}"
+        fecha_objeto = datetime.datetime.strptime(self.selected_date, "%d/%m/%y")
+        dia_semana_numero = fecha_objeto.weekday()
+
+        # Convertir el número a nombre del día de la semana
+        dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        nombre_dia_semana = dias_semana[dia_semana_numero]
         
+        self.selected_date = nombre_dia_semana +", "+self.selected_date
         self.calendar_frame.destroy()  
         
 
@@ -215,11 +223,18 @@ class MainWindow:
             note_limit = note_data.get("limit")
 
             # Mostrar el texto de la nota y la fecha en la nueva ventana
+            # Primera etiqueta: Nota
+            note_label = ttk.Label(viewNote_window, text=f"Nota: \"{note_text}\"", background="#01add3", foreground="white", font=("Helvetica", 18))
+            note_label.pack(padx=15, pady=5)
+
+            # Segunda etiqueta: Fecha de creación
+            created_label = ttk.Label(viewNote_window, text=f"Fecha de creación: {note_date}", background="#01add3", foreground="white", font=("Helvetica", 13))
+            created_label.pack(padx=15, pady=5)
+
+            # Tercera etiqueta: Fecha límite
             if note_limit:
-                note_entry = ttk.Label(viewNote_window, text=f"Nota: \"{note_text}\"\nFecha de creación: {note_date}\nFecha límite: {note_limit}", background="#01add3", foreground="white", font=("Helvetica",13))
-            else:
-                note_entry = ttk.Label(viewNote_window, text=f"Nota: \"{note_text}\"\nFecha de creación: {note_date}", background="#01add3", foreground="white", font=("Helvetica",13))
-            note_entry.pack(padx=15, pady=10)
+                limit_label = ttk.Label(viewNote_window, text=f"Fecha límite: {note_limit}", background="#01add3", foreground="white", font=("Helvetica", 13))
+                limit_label.pack(padx=15, pady=5)
 
             screen_width = viewNote_window.winfo_screenwidth()
             screen_height = viewNote_window.winfo_screenheight()
