@@ -1,6 +1,6 @@
 # Simple Notebook App in Python
 
-This is a simple notebook application built in Python using Tkinter for the graphical user interface. It was created as my first Python project when I was at a beginner level of programming. The aim of this project was to practice fundamental concepts such as GUI development, file handling, and basic data manipulation.
+This is a simple notebook application built in Python using Tkinter for the graphical user interface. It was created as my first Python project when I was at a beginner level of Python programming. The aim of this project was to practice fundamental concepts such as GUI development, file handling, and basic data manipulation.
 
 ## Features
 
